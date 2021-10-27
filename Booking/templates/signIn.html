@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Sign In
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <form method="POST" class="form-register" style="color:white">
+            <h1 class="h3 mb-3 font-weight-normal">
+                Please Create Your Account
+            </h1>
+
+            <br>
+            {{ form.name.label() }}
+            {{ form.name(class="form-control", placeholder="Your name...") }}
+
+            {{ form.surname.label() }}
+            {{ form.surname(class="form-control", placeholder="Your surname...") }}
+
+            {{ form.email.label() }}
+            {{ form.email(class="form-control", placeholder="Your email...") }}
+
+            {{ form.username.label() }}
+            {{ form.username(class="form-control", placeholder="Your username...") }}
+
+            {{ form.password.label() }}
+            {{ form.password(class="form-control", placeholder="Enter password...") }}
+
+            {{ form.password_val.label() }}
+            {{ form.password_val(class="form-control", placeholder="Enter your password again...") }}
+
+            {{ form.role.label() }}
+            {{ form.role(class="form-control", placeholder="Wanted role...") }}
+
+            <br>
+
+            {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+
+        </form>
+    </div>
+</body>
+{% endblock %}
