@@ -1,5 +1,6 @@
-from Booking import db
+from Booking import db, bcrypt, login_manager
 from datetime import datetime
+from flask_login import UserMixin
 
 '''
 Relations:
@@ -21,7 +22,13 @@ db.drop_all()
 db.create_all()
 '''
 
-class User(db.Model):
+# https://flask-login.readthedocs.io/en/latest/#how-it-works
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+# Need to inherit UserMixin because of some necessary function implementation( is_authenticated, is_active, is_anonymous, get_id)
+class User(db.Model, UserMixin):
     __tablename__ = 'bookingUser'
     username = db.Column(db.String(50), primary_key = True)
     name = db.Column(db.String(30), nullable = False)
@@ -44,13 +51,22 @@ class User(db.Model):
         self.name = name
         self.surname = surname
         self.email = email
-        self.password_hash = password
+        self.password_hash = self.hashing_password(password)
         self.wanted_role = wanted_role
         # Until approved by the administrator
         self.real_role = 'Tourist'
 
     def __repr__(self):
         return f'New User: {self.username}'
+
+    # rounds is the number that dictates the 'slowness' and slow is desirable here
+    # Recommendation: The process of hashing should take approximately one second => between 12 and 14 rounds
+    def hashing_password(self, password_raw):
+        return bcrypt.generate_password_hash(password_raw, rounds=14).decode('utf-8')
+
+    # Need to override this method because in User I don't have id like field
+    def get_id(self):
+        return self.username
 
 
 class Offer(db.Model):
@@ -69,7 +85,6 @@ class Offer(db.Model):
 
     # Arrangements that made for this offer
     madeArrangements = db.relationship("Arrangement", backref = "offerForThisArrangement", lazy = True )
-
 
     def __init__(self, startDate, endDate, description, destination, numOfPlaces, price, userWhoCreated):
         self.startDate = startDate
@@ -95,7 +110,6 @@ class Guide(db.Model):
 
     # Arrangements where this guide will work
     madeArrangements = db.relationship("Arrangement", backref = "guideForThisArrangement", lazy = True )
-
 
     def __init__(self, name, surname):
         self.name = name

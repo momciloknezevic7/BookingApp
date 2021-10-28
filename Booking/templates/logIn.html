@@ -8,6 +8,8 @@ Log In
 <body class="text-center">
     <div class="container">
         <form method="POST" class="form-register" style="color:white">
+             <!-- For security: to stop 'Cross Site Request Forgery'; This line generate CSRF token -->
+            {{ form.hidden_tag() }}
             <h1 class="h3 mb-3 font-weight-normal">
                 Welcome back!
             </h1>

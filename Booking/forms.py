@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, SubmitField, validators
 
+from Booking.models import User
 
 # Form for creating new account
 class signInForm(FlaskForm):
@@ -17,6 +18,12 @@ class signInForm(FlaskForm):
                        validators=[validators.InputRequired()]
                        )
     submit = SubmitField(label='Create new account')
+
+    def uniqueUsernameCheck(self, inputUsername):
+        if User.query.filter_by(username=inputUsername).first():
+            return False
+        else:
+            return True
 
 
 # Form for user who already have account

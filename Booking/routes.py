@@ -1,9 +1,10 @@
 from flask import render_template, url_for, redirect
+from flask_login import login_user, logout_user, current_user
 
-from Booking import app
+from Booking import app, db, bcrypt
 from Booking.models import User, Offer, Guide, Arrangement
 from Booking.forms import signInForm, logInForm
-from Booking import db
+
 
 # http://localhost:5000/
 @app.route('/', methods=['GET'])
@@ -20,7 +21,7 @@ def signIn_page():
     form = signInForm()
 
     # Input validation
-    usernameCheck = uniqueUsernameCheck(form.username.data)
+    usernameCheck = form.uniqueUsernameCheck(form.username.data)
     if form.validate_on_submit() and usernameCheck:
         newUser = User(
             username=form.username.data,
@@ -47,20 +48,40 @@ def signIn_page():
         return render_template('signIn.html', form=form)
 
 
-def uniqueUsernameCheck(inputUsername):
-    if User.query.filter_by(username = inputUsername).first():
-        return False
-    else:
-        return True
-
-
 # http://localhost:5000/logIn
 # user already have account
-@app.route('/logIn', methods=['GET'])
+@app.route('/logIn', methods=['GET', 'POST'])
 def logIn_page():
     form = logInForm()
-    return render_template('logIn.html', form=form)
 
+    # Input validation
+    if form.validate_on_submit():
+        # if user exist
+        tmpUser = User.query.filter_by(username=form.username.data).first()
+
+        # is password correct for that username
+        real_password = tmpUser.password_hash
+        input_password = form.password.data
+        check_password = bcrypt.check_password_hash(real_password, input_password)
+
+        if tmpUser and check_password:
+            login_user(tmpUser)
+            print("Welcome back " + tmpUser.username)
+            return redirect(url_for('fullOfferInfo_page'))
+        else:
+            print("CHECK: Wrong password or username")
+            return render_template('logIn.html', form=form)
+    else:
+        print("LogIn: Validation failed!")
+        return render_template('logIn.html', form=form)
+
+
+# 'Page' for logging out
+@app.route('/logout')
+def logOut_function():
+    print(f"INFO: Current user {current_user.username} is logged out!")
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/fullOfferInfo', methods=['GET'])
 def fullOfferInfo_page():
