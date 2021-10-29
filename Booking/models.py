@@ -1,7 +1,6 @@
 from Booking import db, bcrypt, login_manager
 from datetime import datetime
-from flask_login import UserMixin
-
+from flask_user import UserMixin
 '''
 Relations:
     One-to-Many:
@@ -22,10 +21,6 @@ db.drop_all()
 db.create_all()
 '''
 
-# https://flask-login.readthedocs.io/en/latest/#how-it-works
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
 
 # Need to inherit UserMixin because of some necessary function implementation( is_authenticated, is_active, is_anonymous, get_id)
 class User(db.Model, UserMixin):
@@ -40,11 +35,15 @@ class User(db.Model, UserMixin):
     # Role that administrator approved for this user after his request( need for Admin and Tourist Guide role)
     real_role = db.Column(db.String(50))
 
-
     createdOffers = db.relationship("Offer", backref = "offerCreator", lazy = True)
 
     # Arrangements that this user made
     madeArrangement = db.relationship("Arrangement", backref = "userWhoReserved", lazy = True )
+
+    # Field I will you for connecting with roles that I use for authorization
+    # secondary argument indicate association table(User JOIN Role)
+    # NOTE: wanted_role and real_role don't have direct link with this field
+    roles = db.relationship('Role', secondary='user_roles')
 
     def __init__(self, username, name, surname, email, password, wanted_role):
         self.username = username
@@ -53,8 +52,10 @@ class User(db.Model, UserMixin):
         self.email = email
         self.password_hash = self.hashing_password(password)
         self.wanted_role = wanted_role
-        # Until approved by the administrator
+        # Until wanted_role is not approved by admin
         self.real_role = 'Tourist'
+        # By default everyone is Tourist in the beginning
+        self.roles = [db.session.query(Role).filter_by(name="Tourist").first()]
 
     def __repr__(self):
         return f'New User: {self.username}'
@@ -67,6 +68,51 @@ class User(db.Model, UserMixin):
     # Need to override this method because in User I don't have id like field
     def get_id(self):
         return self.username
+
+    # Because of authorization, I need to have id propery with name 'id'
+    # For my User, that is username
+    @property
+    def id(self):
+        # getter
+        return self.username
+
+    @id.setter
+    def id(self, value):
+        # setter
+        self.username = value
+
+    def get_user_by_token(token):
+        return User.query.get(token)
+
+# https://flask-login.readthedocs.io/en/latest/#how-it-works
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
+
+# Tables for authorization: User, Role and association table UserRoles
+class Role(db.Model):
+    '''
+    id | name
+    -----------------
+    1  | Tourist
+    2  | Admin
+    3  | Travel Guide
+    '''
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class UserRoles(db.Model):
+    __tablename__ = 'user_roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.String(50), db.ForeignKey('bookingUser.username', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
 
 class Offer(db.Model):

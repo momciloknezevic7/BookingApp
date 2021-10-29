@@ -1,10 +1,12 @@
 from flask import render_template, url_for, redirect
 from flask_login import login_user, logout_user, current_user
+from flask_user import roles_required, UserManager
 
 from Booking import app, db, bcrypt
 from Booking.models import User, Offer, Guide, Arrangement
 from Booking.forms import signInForm, logInForm
 
+user_manager = UserManager(app, db, User)
 
 # http://localhost:5000/
 @app.route('/', methods=['GET'])
@@ -87,6 +89,21 @@ def logOut_function():
 def fullOfferInfo_page():
     # TODO create new html page with all infos
     return redirect(url_for('index'))
+
+@app.route('/allTouristPossibilities')
+@roles_required('Tourist')
+def touristPossibilities_page():
+    return render_template('tourist.html')
+
+@app.route('/allAdminPossibilities')
+@roles_required('Admin')
+def adminPossibilities_page():
+    return render_template('admin.html')
+
+@app.route('/allGuidePossibilities')
+@roles_required('Travel Guide')
+def guidePossibilities_page():
+    return render_template('guide.html')
 
 
 # http://localhost:5000/allusers

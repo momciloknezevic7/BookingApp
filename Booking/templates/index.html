@@ -14,10 +14,18 @@
   <body>
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">Booking App</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+        {%  if current_user.real_role == 'Tourist'  %}
+            <a class="navbar-brand" href="{{ url_for('touristPossibilities_page') }}">All Possibilities for Tourist {{ current_user.username }}&emsp;|</a>
+        {% elif current_user.real_role == 'Admin' %}
+            <a class="navbar-brand" href="{{ url_for('adminPossibilities_page') }}">All Possibilities for Admin {{ current_user.username }}&emsp;|</a>
+        {% elif current_user.real_role == 'Travel Guide' %}
+            <a class="navbar-brand" href="{{ url_for('guidePossibilities_page') }}">All Possibilities for Travel Guide {{ current_user.username }}&emsp;|</a>
+        {% else %}
+            <a class="navbar-brand" href="#">Booking App &emsp;|</a>
+        {% endif %}
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
