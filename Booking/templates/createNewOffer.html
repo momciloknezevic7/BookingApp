@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+New Offer
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <form method="POST" class="form-register" style="color:white">
+            <!-- For security: to stop 'Cross Site Request Forgery'; This line generate CSRF token -->
+            {{ form.hidden_tag() }}
+            <h1 class="h3 mb-3 font-weight-normal">
+                Create New Offer
+            </h1>
+
+            <br>
+            {{ form.start.label() }}
+            {{ form.start(class="form-control", placeholder="yyyy-mm-dd") }}
+
+            {{ form.end.label() }}
+            {{ form.end(class="form-control", placeholder="yyyy-mm-dd") }}
+
+            {{ form.description.label() }}
+            {{ form.description(class="form-control", placeholder="Description...") }}
+
+            {{ form.destination.label() }}
+            {{ form.destination(class="form-control", placeholder="Destination...") }}
+
+            {{ form.numOfPlaces.label() }}
+            {{ form.numOfPlaces(class="form-control", placeholder="Number of places...") }}
+
+            {{ form.price.label() }}
+            {{ form.price(class="form-control", placeholder="Offer price...") }}
+
+<!--            {{ form.guideId.label() }}-->
+<!--            {{ form.guideId(class="form-control", placeholder="Do not type anything if there is no available guide...") }}-->
+            <br>
+
+            {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+
+        </form>
+        <br> <br> <br>
+        <!--    All available travel guids for this offer: id name surname -->
+<!--        <h3>All available travel guids:</h3>-->
+<!--        <table class="table table-hover table-dark">-->
+<!--            <thead>-->
+<!--                <tr>-->
+<!--                    &lt;!&ndash;Columns&ndash;&gt;-->
+<!--                    <th scope="col">ID</th>-->
+<!--                    <th scope="col">Name</th>-->
+<!--                    <th scope="col">Surname</th>-->
+<!--                </tr>-->
+<!--            </thead>-->
+<!--            <tbody>-->
+<!--                &lt;!&ndash;Rows inside the table&ndash;&gt;-->
+<!--                {% for guide in allAvailableTravelGuids %}-->
+<!--                    <tr>-->
+<!--                        <td>{{ guid.id }}</td>-->
+<!--                        <td>{{ guid.name }}</td>-->
+<!--                        <td>{{ guid.surname }}</td>-->
+<!--                    </tr>-->
+<!--                {% endfor %}-->
+<!--            </tbody>-->
+<!--        </table>-->
+    </div>
+
+
+
+</body>
+{% endblock %}

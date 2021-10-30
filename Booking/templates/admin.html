@@ -1,1 +1,16 @@
-<h1> Admin is here! </h1>
+{% extends 'base.html' %}
+
+{% block title %}
+Admin Page
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+    <div class="container">
+        <!--Create new arrangement-->
+        <a href="{{ url_for('createNewOffer_page') }}" class="btn btn-primary">Create New Offer</a>
+
+    </div>
+</body>
+
+{% endblock %}

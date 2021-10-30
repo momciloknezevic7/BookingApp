@@ -3,8 +3,8 @@ from flask_login import login_user, logout_user, current_user
 from flask_user import roles_required, UserManager
 
 from Booking import app, db, bcrypt
-from Booking.models import User, Offer, Guide, Arrangement
-from Booking.forms import signInForm, logInForm
+from Booking.models import User, Offer, Guide, Arrangement, Request
+from Booking.forms import signInForm, logInForm, newOfferForm
 
 user_manager = UserManager(app, db, User)
 
@@ -16,7 +16,7 @@ def index():
 
 
 # http://localhost:5000/signIn
-# adding new user in base
+# Adding new user in base
 # Need POST method because of SignIn process
 @app.route('/signIn', methods=['GET', 'POST'])
 def signIn_page():
@@ -34,10 +34,15 @@ def signIn_page():
             wanted_role=form.wanted_role.data
         )
 
-        # TODO if wanted_role != 'Tourist' => need to send request to admin(new column in table Requests)
-
         db.session.add(newUser)
         db.session.commit()
+
+        # Role Admin and Travel Guide need to be approved by other admin user
+        if form.wanted_role.data != 'Tourist':
+            newRequest = Request(form.username.data)
+            db.session.add(newRequest)
+            db.session.commit()
+
         return redirect(url_for('fullOfferInfo_page'))
     else:
         for error_value in form.errors.values():
@@ -51,7 +56,7 @@ def signIn_page():
 
 
 # http://localhost:5000/logIn
-# user already have account
+# User already have account
 @app.route('/logIn', methods=['GET', 'POST'])
 def logIn_page():
     form = logInForm()
@@ -114,3 +119,36 @@ def allUsers_page():
         return "I have all users here"
     else:
         return "Fail!"
+
+#----------------------------------------
+def checkWhoIsAvailable(allTravelGuids, startDate, endDate):
+    return allTravelGuids
+
+@app.route('/createNewOffer', methods=['GET', 'POST'])
+@roles_required('Admin')
+def createNewOffer_page():
+    form = newOfferForm()
+
+    # Input validation
+    if form.validate_on_submit():
+
+        newOffer = Offer(
+            startDate=form.start.data,
+            endDate=form.end.data,
+            description=form.description.data,
+            destination=form.destination.data,
+            numOfPlaces=form.numOfPlaces.data,
+            price=form.price.data,
+            userWhoCreated=current_user.username,
+        )
+
+        db.session.add(newOffer)
+        db.session.commit()
+
+        return redirect(url_for('adminPossibilities_page'))
+    else:
+        for error_value in form.errors.values():
+            print(f'NewOffer problem: {error_value}')
+
+        return render_template('createNewOffer.html', form=form)
+

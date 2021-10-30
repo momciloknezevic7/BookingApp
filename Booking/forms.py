@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, SubmitField, validators
+from wtforms import StringField, PasswordField, SelectField, SubmitField, validators, DateField, IntegerField, FloatField
 
 from Booking.models import User
 
@@ -31,3 +31,16 @@ class logInForm(FlaskForm):
     username = StringField(label='Username:', validators=[validators.InputRequired(), validators.length(max=50)])
     password = PasswordField(label='Password:', validators=[validators.InputRequired()])
     submit = SubmitField(label='Log In with existing account')
+
+
+# Form for admin who can create new arrangement
+class newOfferForm(FlaskForm):
+    start = DateField(label='StartDate:', validators=[validators.InputRequired()])
+    end = DateField(label='EndDate:', validators=[validators.InputRequired()])
+    description = StringField(label='Description:', validators=[validators.InputRequired(), validators.length(max=200)])
+    destination = StringField(label='Destination:', validators=[validators.InputRequired(), validators.length(max=100)])
+    numOfPlaces = IntegerField(label='Number of Places:', validators=[validators.InputRequired(), validators.NumberRange(min=1, max=1000)])
+    price = FloatField(label='Price:', validators=[validators.InputRequired()])
+    guideId = IntegerField(label='Guide ID:')
+
+    submit = SubmitField(label='Create Offer')
