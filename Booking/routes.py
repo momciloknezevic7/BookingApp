@@ -1,6 +1,9 @@
-from flask import render_template, url_for, redirect
+from flask import render_template, url_for, redirect, request
 from flask_login import login_user, logout_user, current_user
 from flask_user import roles_required, UserManager
+from datetime import date, datetime
+import smtplib
+from email.message import EmailMessage
 
 from Booking import app, db, bcrypt
 from Booking.models import User, Offer, Guide, Arrangement, Request
@@ -121,6 +124,7 @@ def allUsers_page():
         return "Fail!"
 
 #----------------------------------------
+# TODO
 def checkWhoIsAvailable(allTravelGuids, startDate, endDate):
     return allTravelGuids
 
@@ -152,3 +156,90 @@ def createNewOffer_page():
 
         return render_template('createNewOffer.html', form=form)
 
+@app.route('/modifyOffer', methods=['GET', 'POST'])
+@roles_required('Admin')
+def modifyOffer_page():
+    allOffers = Offer.query.all()
+
+    return render_template('modifyOffer.html', offers=allOffers)
+
+@app.route('/updateOffer/<int:id>', methods=['GET', 'POST'])
+def updateOffer_page(id):
+    offerToUpdate = Offer.query.get(id)
+
+    if request.method == 'POST':
+        offerToUpdate.startDate = datetime.strptime(request.form['startDate'], '%Y-%m-%d').date()
+        offerToUpdate.endDate = datetime.strptime(request.form['endDate'], '%Y-%m-%d').date()
+        offerToUpdate.description = request.form['description']
+        offerToUpdate.destination = request.form['destination']
+        offerToUpdate.numOfPlaces = request.form['numOfPlaces']
+        offerToUpdate.price = request.form['price']
+
+        try:
+            if (offerToUpdate.getStartDate()-date.today()).days > 5:
+                db.session.commit()
+                return redirect(url_for('adminPossibilities_page'))
+            else:
+                print("You are late! Can't update this offer anymore!")
+        except Exception as ex:
+            print(ex)
+            print("Error: Problem with update option!")
+            return render_template('updateOffer.html', offerToUpdate=offerToUpdate)
+    else:
+        # GET method
+        return render_template('updateOffer.html', offerToUpdate=offerToUpdate)
+
+
+def sendMail(username):
+    user = User.query.filter_by(username=username).first()
+
+    # Preparations from sending email
+    emailText = "Dear " + user.name + ", offer where you have arrangement is canceled!"
+
+    emailMessage = EmailMessage()
+    emailMessage.set_content(emailText)
+    emailMessage['Subject'] = "Your arrangement failed on BookingApp"
+    emailMessage['From'] = "bookingAppAdmins@gmail.com"
+    emailMessage['To'] = user.email
+
+    # Sending email
+    # Gmail SMTP port (SSL): 465
+    # Gmail SMTP server address: smtp.gmail.com
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        '''
+        This isn't real gmail address, but this code is successfully tested with real one.
+        First argument is GmailID(part before @ in gmail address)
+        Second argument is password for that gmail
+        '''
+        #smtp.login('bookingAppAdmins', 'password')
+        smtp.send_message(emailMessage)
+
+
+def sendMailToAllTourist(allTouristsForThisOffer):
+    for touristUsername in allTouristsForThisOffer:
+        sendMail(touristUsername)
+
+
+@app.route('/deleteOffer/<int:id>')
+def deleteOffer_page(id):
+    offerToDelete = Offer.query.get(id)
+
+    allTouristsForThisOffer = ['a1', 'c3', 'd4']
+    allArrangementForThisOffer = offerToDelete.getMadeArrangements()
+    for arr in allArrangementForThisOffer:
+        allTouristsForThisOffer.append(arr.getUsernameForReservation())
+
+    try:
+        if (offerToDelete.getStartDate()-date.today()).days > 5:
+            # Sending mail to every tourist who have arrangement for this offer
+            sendMailToAllTourist(allTouristsForThisOffer)
+            db.session.delete(offerToDelete)
+            db.session.commit()
+            return redirect(url_for('adminPossibilities_page'))
+        else:
+            print("You are late! Can't delete this offer anymore!")
+            return redirect(url_for('modifyOffer_page'))
+    except Exception as ex:
+        print(ex)
+        print("Error: Problem with delete option!")
+        return redirect(url_for('modifyOffer_page'))

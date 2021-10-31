@@ -7,8 +7,12 @@ Admin Page
 {% block content %}
 <body class="text-center">
     <div class="container">
-        <!--Create new arrangement-->
+        <!--Create new offer-->
         <a href="{{ url_for('createNewOffer_page') }}" class="btn btn-primary">Create New Offer</a>
+        <br> <br> <br>
+        <!--Modify(update or delete) offer that already exist-->
+        <a href="{{ url_for('modifyOffer_page') }}" class="btn btn-primary">Modify Offer</a>
+        <br>
 
     </div>
 </body>

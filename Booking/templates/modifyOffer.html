@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Modify Offer
+{% endblock %}
+
+{% block content %}
+    <table class="table table-hover table-dark">
+        <thead>
+            <tr>
+                <!--Columns-->
+                <th scope="col">ID</th>
+                <th scope="col">Destination</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--Rows inside the table-->
+            {% for offer in offers %}
+                <tr>
+                    <td>{{ offer.id }}</td>
+                    <td>{{ offer.destination }}</td>
+                    <td>{{ offer.startDate }}</td>
+                    <td>{{ offer.endDate }}</td>
+                    <td>
+                        <a class="nav-link" color="white" href="/updateOffer/{{offer.id}}">Update This Offer</a>
+                    </td>
+                    <td>
+                        <a class="nav-link" color="white" href="/deleteOffer/{{offer.id}}">Delete This Offer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,7 +1,7 @@
 from Booking import db, bcrypt, login_manager
 
 from datetime import date
-from flask_user import UserMixin, roles_required
+from flask_user import UserMixin
 import smtplib
 from email.message import EmailMessage
 
@@ -171,6 +171,12 @@ class Offer(db.Model):
     def setGuideForThisOffer(self, guideId):
         self.guideId = guideId
 
+    def getStartDate(self):
+        return self.startDate
+
+    def getMadeArrangements(self):
+        return self.madeArrangements
+
     def __repr__(self):
         return f'New Offer: {self.id}'
 
@@ -207,6 +213,9 @@ class Arrangement(db.Model):
 
     def __repr__(self):
         return f'New Arrangement: {self.id}'
+
+    def getUsernameForReservation(self):
+        return self.usernameForReservation
 
 
 # Requests submitted by new users for higher role(Admin, Travel Guide)
