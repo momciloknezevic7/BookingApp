@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}
+My Profile
+{% endblock %}
+
+
+{% block content %}
+<body class="text-center">
+    <style>
+      div {
+        margin-bottom: 5px;
+      }
+      label {
+        display: inline-block;
+        width: 155px;
+        text-align: right;
+      }
+    </style>
+
+    <div class="container">
+        <h1 class="h3 mb-3 font-weight-normal">
+            My Profile
+        </h1>
+
+        <br>
+        <form action="/myProfile" METHOD="POST" class="form-register" style="color:white">
+            <label>Name:</label>
+            <input type="text" placeholder="New name..." name="name" value="{{current_user.name}}">
+            <br>
+            <label>Surname:</label>
+            <input type="text" placeholder="New surname..." name="surname" value="{{current_user.surname}}">
+            <br>
+            <label>Username:</label>
+            <input type="text" placeholder="New username..." name="username" value="{{current_user.username}}">
+            <br>
+            <label>Email:</label>
+            <input type="text" placeholder="New email..." name="email" value="{{current_user.email}}">
+            <br>
+            <label>Password:</label>
+            <input type="text" placeholder="New password..." name="password">
+            <br>
+            <label>Password again:</label>
+            <input type="text" placeholder="Enter new password again..." name="password_check">
+            <br>
+            <label>New wanted role:</label>
+            <input type="text" placeholder="Travel Guide/Admin" name="newWanted_role">
+            <br><br><br>
+
+            <input type="submit" value="Update My Profile" class="btn btn-primary">
+        </form>
+    </div>
+
+</body>
+{% endblock %}

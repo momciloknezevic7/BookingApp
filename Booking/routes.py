@@ -166,8 +166,6 @@ def updateOffer_page(id):
     allTravelGuids = Guide.query.all()
     allAvailableTravelGuids = checkWhoIsAvailable(allTravelGuids, offerToUpdate.startDate, offerToUpdate.endDate)
 
-    print(allAvailableTravelGuids)
-
     if request.method == 'POST':
         offerToUpdate.startDate = datetime.strptime(request.form['startDate'], '%Y-%m-%d').date()
         offerToUpdate.endDate = datetime.strptime(request.form['endDate'], '%Y-%m-%d').date()
@@ -278,3 +276,34 @@ def allUsers_page(filter):
             join(Guide, Guide.guideUsername == User.username, isouter=True).\
             filter(User.real_role == "Travel Guide").all()
         return render_template('allUsers.html', result=result)
+
+#------------------------------------------------------------------------------
+
+@app.route('/myProfile', methods=['GET', 'POST'])
+@roles_required('Tourist')
+def myProfile_page():
+    myProfile = User.query.get(current_user.username)
+
+    if request.method == 'POST':
+        myProfile.username = request.form['username']
+        myProfile.name = request.form['name']
+        myProfile.surname = request.form['surname']
+        myProfile.email = request.form['email']
+        myProfile.wanted_role = request.form['newWanted_role']
+
+        # Naive way to change password. Need more security checks #TODO
+        if request.form['password'] == request.form['password_check']:
+            myProfile.password = request.form['password']
+
+        # If Tourist user want to upgrade his role to Travel Guide or Admin
+        if request.form['newWanted_role'] != 'Tourist':
+            newRequest = Request(current_user.username)
+            db.session.add(newRequest)
+            db.session.commit()
+
+        db.session.commit()
+        return redirect(url_for('index'))
+    else:
+        # GET method
+        print("ovdee")
+        return render_template('myProfile.html')
