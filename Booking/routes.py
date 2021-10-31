@@ -46,7 +46,7 @@ def signIn_page():
             db.session.add(newRequest)
             db.session.commit()
 
-        return redirect(url_for('fullOfferInfo_page'))
+        return redirect(url_for('index'))
     else:
         for error_value in form.errors.values():
             print(f'SignIn problem: {error_value}')
@@ -77,7 +77,7 @@ def logIn_page():
         if tmpUser and check_password:
             login_user(tmpUser)
             print("Welcome back " + tmpUser.username)
-            return redirect(url_for('fullOfferInfo_page'))
+            return redirect(url_for('index'))
         else:
             print("CHECK: Wrong password or username")
             return render_template('logIn.html', form=form)
@@ -91,11 +91,6 @@ def logIn_page():
 def logOut_function():
     print(f"INFO: Current user {current_user.username} is logged out!")
     logout_user()
-    return redirect(url_for('index'))
-
-@app.route('/fullOfferInfo', methods=['GET'])
-def fullOfferInfo_page():
-    # TODO create new html page with all infos
     return redirect(url_for('index'))
 
 @app.route('/allTouristPossibilities')
@@ -224,7 +219,7 @@ def sendMailToAllTourist(allTouristsForThisOffer):
 def deleteOffer_page(id):
     offerToDelete = Offer.query.get(id)
 
-    allTouristsForThisOffer = ['a1', 'c3', 'd4']
+    allTouristsForThisOffer = []
     allArrangementForThisOffer = offerToDelete.getMadeArrangements()
     for arr in allArrangementForThisOffer:
         allTouristsForThisOffer.append(arr.getUsernameForReservation())
@@ -243,3 +238,15 @@ def deleteOffer_page(id):
         print(ex)
         print("Error: Problem with delete option!")
         return redirect(url_for('modifyOffer_page'))
+
+
+@app.route('/fullOffersInfo/<string:filter>', methods=['GET'])
+def fullOffersInfo_page(filter):
+
+    if filter == "all":
+        allOffers = Offer.query.all()
+        return render_template('fullOffersInfo.html', offers=allOffers)
+    elif filter == "my":
+        myOffers = Offer.query.filter_by(userWhoCreated=current_user.username)
+        return render_template('fullOffersInfo.html', offers=myOffers)
+
