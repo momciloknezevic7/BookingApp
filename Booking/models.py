@@ -178,7 +178,7 @@ class Offer(db.Model):
         return self.madeArrangements
 
     def __repr__(self):
-        return f'New Offer: {self.id}'
+        return str(self.id)
 
 
 class Guide(db.Model):

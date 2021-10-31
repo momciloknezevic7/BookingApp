@@ -110,10 +110,6 @@ def guidePossibilities_page():
 
 
 #----------------------------------------
-# TODO
-def checkWhoIsAvailable(allTravelGuids, startDate, endDate):
-    return allTravelGuids
-
 @app.route('/createNewOffer', methods=['GET', 'POST'])
 @roles_required('Admin')
 def createNewOffer_page():
@@ -146,12 +142,31 @@ def createNewOffer_page():
 @roles_required('Admin')
 def modifyOffer_page():
     allOffers = Offer.query.all()
-
     return render_template('modifyOffer.html', offers=allOffers)
+
+
+def checkWhoIsAvailable(allTravelGuids, startDate, endDate):
+    allAvailableTravelGuids = []
+    for guide in allTravelGuids:
+        ind = True
+        for offer in guide.madeOffers:
+            fullInfoOffer = Offer.query.get(offer.id)
+            if (startDate >= fullInfoOffer.startDate and startDate <= fullInfoOffer.startDate) or ( endDate >= fullInfoOffer.startDate and endDate <= fullInfoOffer.endDate):
+                ind = False
+        if ind:
+            allAvailableTravelGuids.append(guide)
+
+    return allAvailableTravelGuids
+
+
 
 @app.route('/updateOffer/<int:id>', methods=['GET', 'POST'])
 def updateOffer_page(id):
     offerToUpdate = Offer.query.get(id)
+    allTravelGuids = Guide.query.all()
+    allAvailableTravelGuids = checkWhoIsAvailable(allTravelGuids, offerToUpdate.startDate, offerToUpdate.endDate)
+
+    print(allAvailableTravelGuids)
 
     if request.method == 'POST':
         offerToUpdate.startDate = datetime.strptime(request.form['startDate'], '%Y-%m-%d').date()
@@ -170,10 +185,10 @@ def updateOffer_page(id):
         except Exception as ex:
             print(ex)
             print("Error: Problem with update option!")
-            return render_template('updateOffer.html', offerToUpdate=offerToUpdate)
+            return render_template('updateOffer.html', offerToUpdate=offerToUpdate, allAvailableTravelGuids=allAvailableTravelGuids)
     else:
         # GET method
-        return render_template('updateOffer.html', offerToUpdate=offerToUpdate)
+        return render_template('updateOffer.html', offerToUpdate=offerToUpdate, allAvailableTravelGuids=allAvailableTravelGuids)
 
 
 def sendMail(username):

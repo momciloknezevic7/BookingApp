@@ -26,26 +26,54 @@ Update Offer
         <br>
         <form action="/updateOffer/{{offerToUpdate.id}}" METHOD="POST" class="form-register" style="color:white">
             <label>Start Date:</label>
-            <input type="date" placeholder="Start Date: ", name="startDate" value="{{offerToUpdate.startDate}}">
+            <input type="date" placeholder="Start Date: " name="startDate" value="{{offerToUpdate.startDate}}">
             <br>
             <label>End Date:</label>
-            <input type="date" placeholder="End Date: ", name="endDate" value="{{offerToUpdate.endDate}}">
+            <input type="date" placeholder="End Date: " name="endDate" value="{{offerToUpdate.endDate}}">
             <br>
             <label>Description:</label>
-            <input type="text" placeholder="Description: ", name="description" value="{{offerToUpdate.description}}">
+            <input type="text" placeholder="Description: " name="description" value="{{offerToUpdate.description}}">
             <br>
             <label>Destination:</label>
-            <input type="text" placeholder="Destination: ", name="destination" value="{{offerToUpdate.destination}}">
+            <input type="text" placeholder="Destination: " name="destination" value="{{offerToUpdate.destination}}">
             <br>
             <label>Number Of Places:</label>
-            <input type="text" placeholder="Number of Places: ", name="numOfPlaces" value="{{offerToUpdate.numOfPlaces}}">
+            <input type="text" placeholder="Number of Places: " name="numOfPlaces" value="{{offerToUpdate.numOfPlaces}}">
             <br>
             <label>Price:</label>
-            <input type="number" placeholder="Price: ", name="price" value="{{offerToUpdate.price}}">
-
-            <br><br>
+            <input type="number" placeholder="Price: " name="price" value="{{offerToUpdate.price}}">
+            <br>
+            <label>Guide ID:</label>
+            <input type="number" placeholder="Do not type anything if there is no available guide..." name="guideId" value="{{offerToUpdate.guideId}}">
+            <br><br><br>
             <input type="submit" value="Update Offer" class="btn btn-primary">
         </form>
     </div>
+
+    <div class="container">
+        <br><br>
+    <!--All available travel guids for this offer: id name surname-->
+        <h3>All available travel guids:</h3>
+        <table class="table table-hover table-dark">
+            <thead>
+                <tr>
+                    <!--Columns-->
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Surname</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Rows inside the table-->
+                {% for guide in allAvailableTravelGuids %}
+                    <tr>
+                        <td>{{ guide.id }}</td>
+                        <td>{{ guide.name }}</td>
+                        <td>{{ guide.surname }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
 </body>
 {% endblock %}
