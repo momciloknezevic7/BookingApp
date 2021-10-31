@@ -187,6 +187,8 @@ class Guide(db.Model):
     name = db.Column(db.String(30), nullable=False)
     surname = db.Column(db.String(30), nullable=False)
 
+    guideUsername = db.Column(db.String(50), db.ForeignKey('bookingUser.username'))
+
     # Offers where this guide will work
     madeOffers = db.relationship("Offer", backref="guideForThisOffer", lazy=True)
 

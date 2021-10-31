@@ -109,15 +109,6 @@ def guidePossibilities_page():
     return render_template('guide.html')
 
 
-# http://localhost:5000/allusers
-@app.route('/allusers', methods=['GET'])
-def allUsers_page():
-    users = User.query.all()
-    if len(users) > 0:
-        return "I have all users here"
-    else:
-        return "Fail!"
-
 #----------------------------------------
 # TODO
 def checkWhoIsAvailable(allTravelGuids, startDate, endDate):
@@ -250,3 +241,25 @@ def fullOffersInfo_page(filter):
         myOffers = Offer.query.filter_by(userWhoCreated=current_user.username)
         return render_template('fullOffersInfo.html', offers=myOffers)
 
+
+# http://localhost:5000/allUsers
+@app.route('/allUsers/<string:filter>', methods=['GET'])
+def allUsers_page(filter):
+
+    if filter == "all":
+        result = db.session. \
+            query(User, Guide). \
+            join(Guide, Guide.guideUsername == User.username, isouter=True).all()
+        return render_template('allUsers.html', result=result)
+    elif filter == "onlyTourists":
+        result = db.session. \
+            query(User, Guide). \
+            join(Guide, Guide.guideUsername == User.username, isouter=True).\
+            filter(User.real_role == "Tourist").all()
+        return render_template('allUsers.html', result=result)
+    elif filter == "onlyGuids":
+        result = db.session. \
+            query(User, Guide). \
+            join(Guide, Guide.guideUsername == User.username, isouter=True).\
+            filter(User.real_role == "Travel Guide").all()
+        return render_template('allUsers.html', result=result)
