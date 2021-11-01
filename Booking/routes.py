@@ -93,10 +93,6 @@ def logOut_function():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/allTouristPossibilities')
-@roles_required('Tourist')
-def touristPossibilities_page():
-    return render_template('tourist.html')
 
 @app.route('/allAdminPossibilities')
 @roles_required('Admin')
@@ -307,3 +303,16 @@ def myProfile_page():
         # GET method
         print("ovdee")
         return render_template('myProfile.html')
+
+@app.route('/allTouristPossibilities', methods=['GET', 'POST'])
+@roles_required('Tourist')
+def touristPossibilities_page():
+    allOffers = Offer.query.all()
+    myArrangements = Arrangement.query.filter_by(usernameForReservation=current_user.username)
+
+    # TODO check for every offer
+    offersToDisplay = []
+    for offer in allOffers:
+        pass
+
+    return render_template('tourist.html', offers=allOffers, myArrangements=myArrangements)

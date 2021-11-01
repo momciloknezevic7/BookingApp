@@ -1,1 +1,72 @@
-<h1> Tourist is here! </h1>
+{% extends 'base.html' %}
+
+{% block title %}
+Offers for Tourist
+{% endblock %}
+
+{% block content %}
+<body class="text-center">
+
+    <h1 class="h3 mb-3 font-weight-normal">
+        All Offers:
+    </h1>
+    <table class="table table-hover table-dark">
+        <thead>
+            <tr>
+                <!--Columns-->
+                <th scope="col">ID</th>
+                <th scope="col">Destination</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col">Number of Places</th>
+                <th scope="col">Number of Available Places</th>
+                <th scope="col">Price</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--Rows inside the table-->
+            {% for offer in offers %}
+                <tr>
+                    <td>{{ offer.id }}</td>
+                    <td>{{ offer.destination }}</td>
+                    <td>{{ offer.startDate }}</td>
+                    <td>{{ offer.endDate }}</td>
+                    <td>{{ offer.numOfPlaces }}</td>
+                    <td>{{ offer.numOfAvailablePlaces}}</td>
+                    <td>{{ offer.price }}</td>
+                    <td>
+                        <a class="nav-link" color="white" href="#">Reserve</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br><br><br>
+
+    <h1 class="h3 mb-3 font-weight-normal">
+    My Arrangements:
+    </h1>
+    <table class="table table-hover table-dark">
+        <thead>
+            <tr>
+                <!--Columns-->
+                <th scope="col">ID</th>
+                <th scope="col">Number Of Reserved Places</th>
+                <th scope="col">Offer ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for arr in myArrangements %}
+                <tr>
+                    <td>{{ arr.id }}</td>
+                    <td>{{ arr.numOfReservedPlaces}}</td>
+                    <td>{{ arr.offerId }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+{% endblock %}
